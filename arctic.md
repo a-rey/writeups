@@ -1,5 +1,7 @@
 # [Arctic](https://app.hackthebox.eu/machines/9) 
 
+- Another interesting approach: https://teckk2.github.io/writeup/2017/12/27/Arctic.html
+
 Start off with a quick `nmap`:
 
 ![nmap](./arctic/nmap.png)
