@@ -56,6 +56,8 @@ chmod 777 bubba.elf
 
 This will spawn a dedicated reverse shell that can be upgraded to a TTY shell using the following:
 
+- TTY shell upgrades: https://netsec.ws/?p=337
+
 ```bash
 /usr/bin/script -qc /bin/bash /dev/null
 ```
@@ -76,7 +78,7 @@ sudo -u scriptmanager id      # test user permissions
 
 ![sudo](./bashed/sudo.png)
 
-Next find all files owned by this new use `scriptmanager`. This returns an interesting file at `/scripts/test.py`:
+Next find all files owned by this new user `scriptmanager`. This returns an interesting file at `/scripts/test.py`:
 
 ```bash
 sudo -u scriptmanager find / -user scriptmanager -type f -exec ls -lad {} \; 2>/dev/null
@@ -92,7 +94,7 @@ f.write("testing 123!")
 f.close
 ```
 
-When looing for the file `test.txt`, it seems to be owned by `root`:
+When looking for the file `test.txt`, it seems to be owned by `root`:
 
 ```bash
 sudo -u scriptmanager find / -iname test.txt -type f -exec ls -lad {} \; 2>/dev/null
