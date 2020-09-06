@@ -2,4 +2,5 @@
 
 - [Arctic](arctic.md)
 - [Bankrobber](bankrobber.md)
+- [Bashed](bashed.md)
 
