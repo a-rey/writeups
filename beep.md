@@ -17,7 +17,7 @@ There are quite a few ports open. A few of them have to do with email services:
 
 To enumerate the website, run the following in the background:
 
-- Using `gobuster` beacuse the outdated SSL cert gives errors with `dirb` 
+- Using `gobuster` because the outdated SSL cert gives errors with `dirb` ...
 
 ```bash
 sudo apt install gobuster
@@ -151,7 +151,7 @@ For privilege escalation, enumerating user permissions shows interesting values:
 
 ![sudo](./beep/sudo.png)
 
-`nmap` is a known GTFO binary! Getting root is done by running nmap interactively:
+`nmap` is a known GTFO binary! Getting `root` is done by running `nmap` interactively:
 
 - https://gtfobins.github.io/gtfobins/nmap/
 
