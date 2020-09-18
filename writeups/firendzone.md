@@ -204,9 +204,6 @@ function executeCommand(string $command) {
     $output = ob_get_contents();
     ob_end_clean();
   } else if(function_exists('system')){
-    # this is the last resort. chances are PHP Suhosin
-    # has system() on a blacklist anyways :>
-
     # http://php.net/manual/en/function.system.php
     system($command);
   }
