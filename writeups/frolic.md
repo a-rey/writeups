@@ -496,7 +496,7 @@ x/60x $eax
 
 ![gdb1](./frolic/gdb1.png)
 
-Notice how `eax` is pushed onto the stack as the first argument for `strcpy()`. Looknig at the memory contents for `eax` before and after the call to `strcpy()` shows the following:
+Notice how `eax` is pushed onto the stack as the first argument for `strcpy()`. Looking at the memory contents for `eax` before and after the call to `strcpy()` shows the following:
 
 ![gdb2](./frolic/gdb2.png)
 
@@ -504,7 +504,7 @@ This shows that the 48 character buffer (with a NULL byte) ends right before `0x
 
 ![gdb3](./frolic/gdb3.png)
 
-Now that the overflow offsets are finalized, check for shellcode locations with the following Bash function `checksec`:
+Now that the overflow offsets are finalized, check for shellcode execution with the following Bash function `checksec`:
 
 - Pulled from `checksec.sh`: https://www.trapkit.de/tools/checksec.html
 - https://bitvijays.github.io/LFC-BinaryExploitation.html
@@ -512,8 +512,8 @@ Now that the overflow offsets are finalized, check for shellcode locations with 
 ```bash
 function checksec() {
   # check for RELRO support
-  if readelf -l $file 2>/dev/null | grep -q 'GNU_RELRO'; then
-    if readelf -d $file 2>/dev/null | grep -q 'BIND_NOW'; then
+  if readelf -l $1 2>/dev/null | grep -q 'GNU_RELRO'; then
+    if readelf -d $1 2>/dev/null | grep -q 'BIND_NOW'; then
       echo -e '\033[32mFull RELRO\033[m'
     else
       echo -e '\033[33mPartial RELRO\033[m'
@@ -522,22 +522,22 @@ function checksec() {
     echo -e '\033[31mNo RELRO\033[m'
   fi
   # check for stack canary support
-  if readelf -s $file 2>/dev/null | grep -q '__stack_chk_fail'; then
+  if readelf -s $1 2>/dev/null | grep -q '__stack_chk_fail'; then
     echo -e '\033[32mStack canary found\033[m'
   else
     echo -e '\033[31mNo stack canary found\033[m'
   fi
   # check for NX support
-  if readelf -W -l $file 2>/dev/null | grep 'GNU_STACK' | grep -q 'RWE'; then
+  if readelf -W -l $1 2>/dev/null | grep 'GNU_STACK' | grep -q 'RWE'; then
     echo -e '\033[31mNX disabled\033[m'
   else
     echo -e '\033[32mNX enabled\033[m'
   fi 
   # check for PIE support
-  if readelf -h $file 2>/dev/null | grep -q 'Type:[[:space:]]*EXEC'; then
+  if readelf -h $1 2>/dev/null | grep -q 'Type:[[:space:]]*EXEC'; then
     echo -e '\033[31mNo PIE\033[m'
-  elif readelf -h $file 2>/dev/null | grep -q 'Type:[[:space:]]*DYN'; then
-    if readelf -d $file 2>/dev/null | grep -q '(DEBUG)'; then
+  elif readelf -h $1 2>/dev/null | grep -q 'Type:[[:space:]]*DYN'; then
+    if readelf -d $1 2>/dev/null | grep -q '(DEBUG)'; then
       echo -e '\033[32mPIE enabled\033[m'
     else   
       echo -e '\033[33mDSO\033[m'
@@ -546,12 +546,12 @@ function checksec() {
     echo -e '\033[33mNot an ELF file\033[m'
   fi 
   # check for run path
-  if readelf -d $file 2>/dev/null | grep -q 'rpath'; then
+  if readelf -d $1 2>/dev/null | grep -q 'rpath'; then
    echo -e '\033[31mRPATH set\033[m'
   else
    echo -e '\033[32mNo RPATH set\033[m'
   fi
-  if readelf -d $file 2>/dev/null | grep -q 'runpath'; then
+  if readelf -d $1 2>/dev/null | grep -q 'runpath'; then
    echo -e '\033[31mRUNPATH set\033[m'
   else
    echo -e '\033[32mNo RUNPATH set\033[m'
