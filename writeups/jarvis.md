@@ -211,7 +211,7 @@ Nice! That means that columns 2, 3, 4 and 5 are returned directly into the HTML 
 
 ![html](./jarvis/html.png)
 
-Column 7 is not shows and columns 1 & 6 are embedded into URLs in the HTML. Using this, make a request to see which user this query is running as (using column 4 since it is easily inserted into a `<p>` tag):
+Column 7 is not shown and columns 1 & 6 are embedded into URLs in the HTML. Using this, make a request to see which user this query is running as (using column 4 since it is easily inserted into a `<p>` tag):
 
 - Note: Assuming MariaDB backend since it is common: https://mariadb.com/kb/en/user/
 
