@@ -442,11 +442,11 @@ Looking at strings in the binary, there is an indication that there is a buffer 
 Transfer the file from the target using base64 & copy/paste:
 
 ```bash
- # run on target and copy output
- cat /home/ayush/.binary/rop | base64
- # run on kali with target's output in rop.64 file
- cat rop.b64 | base64 -d > rop
- chmod +x rop
+# run on target and copy output
+cat /home/ayush/.binary/rop | base64
+# run on kali with target's output in rop.64 file
+cat rop.b64 | base64 -d > rop
+chmod +x rop
 ```
 
 Setup [Ghidra](https://ghidra-sre.org/) to reverse engineer the binary:
