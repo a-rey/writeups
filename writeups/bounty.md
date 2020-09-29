@@ -106,7 +106,7 @@ In order to test these values, the HTML source of `/transfer.aspx` is needed to 
 
 ![html](./bounty/html.png)
 
-There are 4 values to send in the HTTP POST request. 2 of them, `__VIEWSTATE` and `__EVENTVALIDATION` are generated tokens for each requests. So they need to be fetched in an HTTP GET request first. This list can now be tested in the following Python script:
+There are 4 values to send in the HTTP POST request. 2 of them, `__VIEWSTATE` and `__EVENTVALIDATION`, are generated tokens for each request. So they need to be fetched in an HTTP GET request first. This list can now be tested in the following Python script:
 
 ```python
 import io
@@ -152,7 +152,7 @@ The blog explains the process of using `web.config` uploaded to a sub-directory 
 
 - https://soroush.secproject.com/blog/2019/08/uploading-web-config-for-fun-and-profit-2/
 
-The links say that if the ISS server supports execution of ASP, that the following `web.config` will allow for ASP code execution and display `3` when browsing to the file:
+The links say that if the IIS server supports execution of ASP, that the following `web.config` will allow for ASP code execution and display `3` when browsing to the file:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -269,7 +269,7 @@ From that tool, there is more output:
 
 ![wesng2](./bounty/wesng2.png)
 
-MS10-059 is a solid choice since it is already found pre-compiled at https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS10-059. Just download, upload and execute:
+MS10-059 is a solid choice since it is already found pre-compiled at https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS10-059. Just download, upload, and execute:
 
 ```bash
 # on kali, download exploit:
