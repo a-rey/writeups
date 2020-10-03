@@ -127,11 +127,11 @@ if __name__ == '__main__':
   display_results()
 ```
 
-This returns script the following internal URLs:
+This script returns the following internal URLs:
 
 ![recon](./buff/recon.png)
 
-Looking at these pages doesn't show too much. The results from `gobuster` show the following when looking for HTTP 200  response codes:
+Looking at these pages doesn't show too much. The results from `gobuster` shows the following when looking for HTTP 200  response codes:
 
 ```bash
 cat gobuster.txt | grep 200
@@ -620,9 +620,9 @@ Looking at local network connections shows another interesting find:
 netstat -ano
 ```
 
-![netstat](./buff/netstat.png)
+![netstat1](./buff/netstat1.png)
 
-The 3306 is MySQL but 8888 is unique. Trying to find out the process listeneing on this port is difficult since the process seems to keep changing every couple of seconds:
+The 3306 is MySQL but 8888 is unique. Trying to find out the process listening on this port is difficult since the process seems to keep changing every second:
 
 ```bash
 powershell.exe -c "Get-Process -Id (Get-NetTCPConnection -LocalPort 8888).OwningProcess"
@@ -702,7 +702,7 @@ However, this does not work with the following error:
 
 ![plink1](./buff/plink1.png)
 
-Maybe there is a firewall rule blocking outbound TCP on port 22? It cannot be a network connectivity issue since there is a working reverse shell on that target... Trying the connection again but with a `tcpdump` running does not show any packet activity coming to Kali:
+Maybe there is a firewall rule blocking outbound TCP on port 22? It cannot be a network connectivity issue since there is a working reverse shell on the target... Trying the connection again but with a `tcpdump` running does not show any packet activity coming to Kali:
 
 ```bash
 sudo tcpdump -i tun0 port 22
