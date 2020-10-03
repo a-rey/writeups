@@ -80,7 +80,7 @@ searchsploit pi hole
 
 ![pihole_v](./mirai/pihole_v.png)
 
-These require valid credentials. Moving on... The full `nmap` TCP can should have finished and returns a new port & service:
+These require valid credentials. Moving on... The full `nmap` TCP scan should have finished and returns a new port & service:
 
 - `32400/tcp open  http    Plex Media Server httpd`
 
