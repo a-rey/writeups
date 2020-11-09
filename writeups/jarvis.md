@@ -192,7 +192,7 @@ The underlying SQL query now looks more like the following with this injection:
 
 ```sql
 -- X is the column number to order results the by
-SELECT c1,c2,c3,c4,c5,c6,c7 FROM rooms WHERE ID=6 ORDER BY X 
+SELECT c1,c2,c3,c4,c5,c6,c7 FROM rooms WHERE ID=6 ORDER BY 7
 ```
 
 Knowing there are 8 columns, now make a `UNION` query to return user requested results:
