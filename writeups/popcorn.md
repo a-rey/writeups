@@ -321,3 +321,8 @@ After this, the exploit compiles and runs to give a `root` shell:
 
 ![root1](./popcorn/root1.png)
 
+---
+
+Here is another way to `root` as well:
+
+- https://www.exploit-db.com/exploits/15704
