@@ -474,7 +474,7 @@ Add-DomainObjectAcl -Credential $cred -TargetIdentity "DC=htb,DC=local" -Princip
 
 And this finally works:
 
-- **NOTE:** It still could not work for the `svc-alfresco` account though...
+- **NOTE:** It still could not work for the `svc-alfresco` account though... Further research showed that the issue was due to LDAP re-binding. Basically refreshing the session as `svc-alfresco` in order to load the new permissions before trying to add DCSync. **However**, there was also a script on the target at `C:\users\administrator\documents\revert.ps1`, which was reverting accounts and removing DCSync rights every 60 seconds. This is why creating a new user worked well.
 
 ![user5](./forest/user5.png)
 
