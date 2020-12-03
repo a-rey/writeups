@@ -74,4 +74,6 @@
 	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Windows) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=Apache-TomCat) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=TomCat-Manager-WAR-Upload)
 - [SolidState](./writeups/solidstate.md)
 	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Linux) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=POP3) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=Python) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=JAMES-SMTP-Exploit) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=rbash-Escape) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=Cron) 
+- [Legacy](./writeups/legacy.md)
+	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Windows) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=SMB) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=MS17-010) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=MS08-067) 
 
