@@ -70,4 +70,6 @@
 	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Windows) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=IIS-WebDav) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=IIS-6.0-WebDav-Upload) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=MS09-012)
 - [Shocker](./writeups/shocker.md)
 	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Linux) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=Apache-CGI) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=ShellShock-Apache) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=Sudo-Perl)
+- [Jerry](./writeups/jerry.md)
+	- ![TAG](https://img.shields.io/static/v1?label=&color=green&style=flat-square&message=Windows) ![TAG](https://img.shields.io/static/v1?label=&color=blue&style=flat-square&message=Apache-TomCat) ![TAG](https://img.shields.io/static/v1?label=&color=red&style=flat-square&message=TomCat-Manager-WAR-Upload)
 
