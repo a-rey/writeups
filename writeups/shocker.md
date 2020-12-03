@@ -11,7 +11,7 @@ sudo nmap -sS -p $tcpports -oA tcp --open -Pn --script "default,safe,vuln" -sV 1
 # TCP quick scan
 sudo nmap -v -sS -sC -F --open -Pn -sV 10.10.10.56
 # UDP quick scan
-sudo nmap -v -sU -p1-65535 --open -Pn -sV --version-intensity 0 10.10.10.56
+sudo nmap -v -sU -F --open -Pn -sV --version-intensity 0 10.10.10.56
 ```
 
 The TCP quick scan returns the following:
