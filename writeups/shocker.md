@@ -38,7 +38,7 @@ Site looks custom. Start a directroy scanner looking for `php` pages:
 
 ```bash
 ulimit -n 8192 # prevent file access error during gobuster scanning
-gobuster dir -t 50 -r -q -z -o gobuster.misc.txt -x php \
+gobuster dir -t 50 -r -q -z -o gobuster.txt -x php \
   -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
   -a 'Mozilla/5.0' \
   -u http://10.10.10.56/ &

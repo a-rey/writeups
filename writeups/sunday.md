@@ -233,7 +233,7 @@ su bubba
 
 However, this gives a `su: Unknown id: bubba` error? Googling this error does not help... Instead of adding a new user to `/etc/passwd`, just replace the password for `root` with the same known passwords for `sammy` or `sunny` in `/etc/shadow` by using `/backup/shadow.backup` as a template.
 
-However, this is boring (annoyed the basic `/tc/passwd` did not work). Instead, use the `wget` to overwrite a SUID binary on the target and use it to get a dedicated shell. First, find these binaries on the target:
+However, this is boring (annoyed the basic `/etc/passwd` did not work). Instead, use the `wget` to overwrite a SUID binary on the target and use it to get a dedicated shell. First, find these binaries on the target:
 
 ```bash
 find / -perm -u=s -type f -exec ls -lad {} \; 2>/dev/null
