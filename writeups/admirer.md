@@ -163,7 +163,7 @@ It looks like backup of the website? The `utility-scripts` directory is interest
 
 It looks like this folder is valid. Looking at `w4ld0s_s3cr3t_d1r` in the backup shows that it is not active on the target and has "similar" content to `/admin-dir` on the target. From here, an option to try is password re-use and try to get access over SSH using the passwords from `credentials.txt` and the possible usernames in `contacts.txt` from the target and the backup. However, first try to see if these PHP scripts have a vulnerability. The `admin_tasks.php` has the following content:
 
-```php+HTML
+```HTML
 <html>
 <head>
   <title>Administrative Tasks</title>
