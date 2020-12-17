@@ -465,7 +465,5 @@ This should display the following:
 
 Then return the following shell as SYSTEM:
 
-- Forgot to snag `user.txt` in this image but feeling lazy...
-
 ![root1](./fuse/root1.png)
 
