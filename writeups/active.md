@@ -22,7 +22,7 @@ The UDP quick scan returns the following:
 
 ![nmap2](./active/nmap2.png)
 
-The TCP/UDP port 88 is usually only open on a domain controller... Check the domain `active.htb` from `nmap` using DNS;
+The TCP/UDP port 88 is usually only open on a domain controller... Check the domain `active.htb` from `nmap` using DNS:
 
 ```bash
 nslookup
